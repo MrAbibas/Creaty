@@ -1,7 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
@@ -17,7 +14,11 @@ public class SiteLoader : MonoBehaviour
         else
             Destroy(this);
     }
-    internal void StartLoad(string url, UnityAction<string> loadHandler) => StartCoroutine(Load(url, loadHandler));
+    internal void StartLoad(string url, UnityAction<string> loadHandler)
+    {
+        StopAllCoroutines();
+        StartCoroutine(Load(url, loadHandler));
+    }
     internal IEnumerator Load(string url, UnityAction<string> loadHandler)
     {
         UnityWebRequest data = new UnityWebRequest(url);

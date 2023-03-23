@@ -16,9 +16,26 @@ public class UIController : MonoBehaviour
     [SerializeField]
     private GameObject imagePrefab;
     private Image[] images;
+    private Vector2 gridCellSize;
     void Start()
     {
-        goButton.onClick.AddListener(() => ImageLoader.Instance.StartLoadImages(urlText.text, ImageCountLoaded, ImageLoaded));
+        gridCellSize = grid.GetComponent<GridLayoutGroup>().cellSize;
+        goButton.onClick.AddListener(GoButtonClick);
+    }
+    void GoButtonClick()
+    {
+        ClearImages();
+        ImageLoader.Instance.StartLoadImages(urlText.text, ImageCountLoaded, ImageLoaded);
+    }
+    void ClearImages()
+    {
+        if (images == null || images.Length == 0) return;
+        for (int i = 0; i < images.Length; i++)
+        {
+            Destroy(images[i].rectTransform.parent.gameObject);
+        }
+        images = null;
+        countText.text = "0";
     }
     void ImageCountLoaded(int count)
     {
@@ -30,13 +47,12 @@ public class UIController : MonoBehaviour
     void ImageLoaded(ImageInfo imageInfo)
     {
         Image image = images[imageInfo.id];
-        images[imageInfo.id].sprite = imageInfo.sprite;
-        images[imageInfo.id].color = Color.white;
-        float x = images[imageInfo.id].rectTransform.parent.GetComponent<RectTransform>().sizeDelta.x;
+        image.sprite = imageInfo.sprite;
+        image.color = Color.white;
         images[imageInfo.id].rectTransform.sizeDelta = new Vector2()
         {
-            x = x,
-            y = image.sprite.texture.height * (x / image.sprite.texture.width)
+            x = gridCellSize.x,
+            y = Mathf.Min(gridCellSize.x * image.sprite.texture.height/image.sprite.texture.width, gridCellSize.y),
         };
     }
 }
